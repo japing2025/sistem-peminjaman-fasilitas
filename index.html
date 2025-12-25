@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peminjaman Universitas Muhammadiyah Gresik</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-red: #dc2626;
+      --dark-red: #991b1b;
+      --light-red: #fecaca;
+      --bg-dark: #0f0f0f;
+      --bg-card: #1a1a1a;
+      --text-light: #f5f5f5;
+      --text-gray: #a3a3a3;
+      --border: #262626;
+      --success: #16a34a;
+      --warning: #f59e0b;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      width: 45px;
+      height: 45px;
+      background: var(--primary-red);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s;
+    }
+
+    .hamburger:hover {
+      background: var(--dark-red);
+      transform: scale(1.05);
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    .sidebar {
+      position: fixed;
+      left: -280px;
+      top: 0;
+      width: 280px;
+      height: 100vh;
+      background: var(--bg-card);
+      border-right: 2px solid var(--primary-red);
+      padding: 80px 0 20px;
+      transition: left 0.3s;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .sidebar-logo i {
+      font-size: 2rem;
+      color: var(--primary-red);
+    }
+
+    .sidebar-logo-text h2 {
+      font-size: 1.1rem;
+      color: var(--text-light);
+    }
+
+    .sidebar-logo-text p {
+      font-size: 0.75rem;
+      color: var(--text-gray);
+    }
+
+    .user-info {
+      background: linear-gradient(135deg, var(--dark-red), var(--primary-red));
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .user-info h3 {
+      font-size: 0.9rem;
+      margin-bottom: 3px;
+    }
+
+    .user-info p {
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .sidebar-nav {
+      padding: 20px 0;
+    }
+
+    .nav-item {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+      color: var(--text-gray);
+    }
+
+    .nav-item:hover {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--text-light);
+      border-left-color: var(--primary-red);
+    }
+
+    .nav-item.active {
+      background: rgba(220, 38, 38, 0.2);
+      color: var(--primary-red);
+      border-left-color: var(--primary-red);
+      font-weight: 600;
+    }
+
+    .nav-item i {
+      font-size: 1.1rem;
+      width: 20px;
+    }
+
+    .main-content {
+      margin-left: 0;
+      padding: 80px 20px 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      transition: margin-left 0.3s;
+    }
+
+    .page-header {
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .page-title i {
+      font-size: 1.5rem;
+      color: var(--primary-red);
+    }
+
+    .page-title h1 {
+      font-size: 1.3rem;
+    }
+
+    .page-title p {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      margin-top: 3px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary-red);
+      box-shadow: 0 10px 30px rgba(220, 38, 38, 0.2);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: var(--primary-red);
+      opacity: 0.05;
+      border-radius: 50%;
+      transform: translate(30%, -30%);
+    }
+
+    .stat-icon {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .stat-icon i {
+      font-size: 1.3rem;
+      color: white;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-gray);
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .btn-primary {
+      background: var(--primary-red);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--dark-red);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-light);
+      border: 1px solid var(--border);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.4s;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: var(--primary-red);
+      border-radius: 2px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--primary-red);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    td {
+      color: var(--text-gray);
+      font-size: 0.85rem;
+    }
+
+    tr:hover {
+      background: rgba(220, 38, 38, 0.05);
+    }
+
+    .badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .badge-pending {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    .badge-approved {
+      background: rgba(22, 163, 74, 0.2);
+      color: var(--success);
+    }
+
+    .badge-rejected {
+      background: rgba(220, 38, 38, 0.2);
+      color: var(--primary-red);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(5px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s;
+      margin: auto;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text-gray);
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .close-modal:hover {
+      background: rgba(220, 38, 38, 0.2);
+      color: var(--primary-red);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary-red);
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    #loginPage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-dark);
+      z-index: 9999;
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 450px;
+      max-width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .login-header {
+      background: linear-gradient(135deg, var(--dark-red), var(--primary-red));
+      padding: 25px;
+      text-align: center;
+    }
+
+    .login-header i {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .login-header h1 {
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+    }
+
+    .login-header p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .login-body {
+      padding: 25px;
+    }
+
+    .login-error {
+      display: none;
+      background: rgba(220, 38, 38, 0.2);
+      color: var(--primary-red);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    @media (min-width: 1200px) {
+      .sidebar.active ~ .main-content {
+        margin-left: 280px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 80px 15px 15px;
+      }
+
+      .page-header {
+        padding: 15px;
+      }
+
+      .page-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .page-title i {
+        font-size: 1.3rem;
+      }
+
+      .page-title h1 {
+        font-size: 1.1rem;
+      }
+
+      .page-title p {
+        font-size: 0.75rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .stat-card {
+        padding: 15px;
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+      }
+
+      .btn {
+        padding: 8px 14px;
+        font-size: 0.8rem;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      .card-title {
+        font-size: 1rem;
+      }
+
+      th, td {
+        padding: 10px 8px;
+        font-size: 0.75rem;
+      }
+
+      .modal-content {
+        padding: 20px;
+      }
+
+      .modal-title {
+        font-size: 1.1rem;
+      }
+
+      .login-header {
+        padding: 20px;
+      }
+
+      .login-header h1 {
+        font-size: 1.1rem;
+      }
+
+      .login-body {
+        padding: 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .action-buttons .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hamburger {
+        width: 40px;
+        height: 40px;
+        top: 15px;
+        left: 15px;
+      }
+
+      .sidebar {
+        width: 260px;
+        left: -260px;
+      }
+
+      .page-title h1 {
+        font-size: 1rem;
+      }
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+      }
+
+      .stat-icon i {
+        font-size: 1.1rem;
+      }
+
+      .stat-value {
+        font-size: 1.3rem;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+      }
+
+      table {
+        min-width: 500px;
+      }
+
+      th, td {
+        padding: 8px 6px;
+        font-size: 0.7rem;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loginPage">
+    <div class="login-container">
+      <div class="login-header">
+        <i class="fas fa-building"></i>
+        <h1>Peminjaman Fasilitas Universitas Muhammadiyah Gresik</h1>
+        <p>Sistem Manajemen Aset Prodi</p>
+      </div>
+      <div class="login-body">
+        <div id="loginError" class="login-error">
+          <i class="fas fa-exclamation-circle"></i> Email atau password salah
+        </div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="loginEmail" required placeholder="admin@umg.ac.id">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" id="loginPassword" required placeholder="Masukkan password">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-gray);">
+          <strong>Demo Account:</strong><br>
+          Admin: admin@umg.ac.id / admin123<br>
+          Organisasi: hima@umg.ac.id / hima123
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="hamburger" id="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="fas fa-building"></i>
+        <div class="sidebar-logo-text">
+          <h2>Universitas Muhammadiyah Gresik</h2>
+          <p>Sistem Peminjaman</p>
+        </div>
+      </div>
+      <div class="user-info">
+        <h3 id="userRole">Administrator</h3>
+        <p id="userEmail">admin@umg.ac.id</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showSection('dashboard')">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="showSection('barang')" id="navBarang">
+        <i class="fas fa-box"></i>
+        <span>Kelola Barang</span>
+      </div>
+      <div class="nav-item" onclick="showSection('ruangan')" id="navRuangan">
+        <i class="fas fa-door-open"></i>
+        <span>Kelola Ruangan</span>
+      </div>
+      <div class="nav-item" onclick="showSection('peminjaman')">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Peminjaman</span>
+      </div>
+      <div class="nav-item" onclick="showSection('riwayat')">
+        <i class="fas fa-history"></i>
+        <span>Riwayat</span>
+      </div>
+      <div class="nav-item" onclick="showSection('laporan')" id="navLaporan">
+        <i class="fas fa-chart-bar"></i>
+        <span>Laporan</span>
+      </div>
+      <div class="nav-item" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    
+    <section id="dashboard" class="content-section active">
+      <div class="page-header">
+        <div class="page-title">
+          <div>
+            <i class="fas fa-home"></i>
+          </div>
+          <div>
+            <h1>Dashboard</h1>
+            <p>Monitoring sistem peminjaman aset UMG</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="stat-value" id="totalBarang">0</div>
+          <div class="stat-label">Total Barang</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-door-open"></i>
+          </div>
+          <div class="stat-value" id="totalRuangan">0</div>
+          <div class="stat-label">Total Ruangan</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="stat-value" id="peminjamanAktif">0</div>
+          <div class="stat-label">Peminjaman Aktif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-hourglass-half"></i>
+          </div>
+          <div class="stat-value" id="peminjamanPending">0</div>
+          <div class="stat-label">Menunggu Persetujuan</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Peminjaman Terbaru</h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Organisasi</th>
+                <th>Item</th>
+                <th>Tanggal</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="dashboardTable">
+              <tr>
+                <td colspan="4" style="text-align: center; padding: 30px;">Belum ada data peminjaman</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="barang" class="content-section">
+      <div class="page-header">
+        <div class="page-title">
+          <div>
+            <i class="fas fa-box"></i>
+          </div>
+          <div>
+            <h1>Kelola Barang</h1>
+            <p>Manajemen inventaris barang UMG</p>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modalAddBarang')">
+          <i class="fas fa-plus"></i> Tambah Barang
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama Barang</th>
+                <th>Kategori</th>
+                <th>Stok</th>
+                <th>Kondisi</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="barangTable">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px;">Belum ada data barang</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="ruangan" class="content-section">
+      <div class="page-header">
+        <div class="page-title">
+          <div>
+            <i class="fas fa-door-open"></i>
+          </div>
+          <div>
+            <h1>Kelola Ruangan</h1>
+            <p>Manajemen ruangan UMG</p>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modalAddRuangan')">
+          <i class="fas fa-plus"></i> Tambah Ruangan
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama Ruangan</th>
+                <th>Kapasitas</th>
+                <th>Fasilitas</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="ruanganTable">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px;">Belum ada data ruangan</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="peminjaman" class="content-section">
+      <div class="page-header">
+        <div class="page-title">
+          <div>
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          <div>
+            <h1>Peminjaman</h1>
+            <p>Daftar pengajuan peminjaman</p>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modalAddPeminjaman')" id="btnAjukanPeminjaman">
+          <i class="fas fa-plus"></i> Ajukan Peminjaman
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Organisasi</th>
+                <th>Jenis</th>
+                <th>Item</th>
+                <th>Tanggal Pinjam</th>
+                <th>Tanggal Kembali</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="peminjamanTable">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 30px;">Belum ada data peminjaman</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="riwayat" class="content-section">
+      <div class="page-header">
+        <div class="page-title">
+          <div>
+            <i class="fas fa-history"></i>
+          </div>
+          <div>
+            <h1>Riwayat Peminjaman</h1>
+            <p>History peminjaman selesai & dibatalkan</p>
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="exportRiwayat()">
+          <i class="fas fa-download"></i> Export
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Organisasi</th>
+                <th>Jenis</th>
+                <th>Item</th>
+                <th>Tanggal</th>
+                <th>Status Akhir</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="riwayatTable">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 30px;">Belum ada riwayat</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="laporan" class="content-section">
+      <div class="page-header">
+        <div class="page-title">
+          <div>
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div>
+            <h1>Laporan</h1>
+            <p>Statistik dan analisis peminjaman</p>
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="exportLaporan()">
+          <i class="fas fa-download"></i> Export Excel
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-value" id="totalSelesai">0</div>
+          <div class="stat-label">Peminjaman Selesai</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-times-circle"></i>
+          </div>
+          <div class="stat-value" id="totalDitolak">0</div>
+          <div class="stat-label">Peminjaman Ditolak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-value" id="totalOrganisasi">0</div>
+          <div class="stat-label">Total Organisasi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-value" id="totalBulanIni">0</div>
+          <div class="stat-label">Peminjaman Bulan Ini</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Grafik Peminjaman Per Bulan</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartPeminjaman"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Grafik Status Peminjaman</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartStatus"></canvas>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="modalAddBarang" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-box"></i> <span id="modalBarangTitle">Tambah Barang</span></h3>
+        <button class="close-modal" onclick="closeModal('modalAddBarang')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="formAddBarang">
+        <input type="hidden" id="editBarangId">
+        <div class="form-group">
+          <label class="form-label">Kode Barang</label>
+          <input type="text" class="form-control" id="kodeBarang" required placeholder="BRG001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Barang</label>
+          <input type="text" class="form-control" id="namaBarang" required placeholder="Proyektor">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <select class="form-control" id="kategoriBarang" required>
+            <option value="">Pilih Kategori</option>
+            <option value="Elektronik">Elektronik</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Alat Tulis">Alat Tulis</option>
+            <option value="Multimedia">Multimedia</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Stok</label>
+          <input type="number" class="form-control" id="stokBarang" required min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kondisi</label>
+          <select class="form-control" id="kondisiBarang" required>
+            <option value="Baik">Baik</option>
+            <option value="Rusak Ringan">Rusak Ringan</option>
+            <option value="Rusak Berat">Rusak Berat</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keterangan</label>
+          <textarea class="form-control" id="keteranganBarang" rows="3" placeholder="Deskripsi barang..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i class="fas fa-save"></i> <span id="btnSaveBarang">Simpan Barang</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalAddRuangan" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-door-open"></i> <span id="modalRuanganTitle">Tambah Ruangan</span></h3>
+        <button class="close-modal" onclick="closeModal('modalAddRuangan')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="formAddRuangan">
+        <input type="hidden" id="editRuanganId">
+        <div class="form-group">
+          <label class="form-label">Kode Ruangan</label>
+          <input type="text" class="form-control" id="kodeRuangan" required placeholder="R101">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Ruangan</label>
+          <input type="text" class="form-control" id="namaRuangan" required placeholder="Lab Komputer 1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kapasitas</label>
+          <input type="number" class="form-control" id="kapasitasRuangan" required min="1" value="30">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fasilitas</label>
+          <textarea class="form-control" id="fasilitasRuangan" rows="3" placeholder="AC, Proyektor, Whiteboard..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="statusRuangan" required>
+            <option value="Tersedia">Tersedia</option>
+            <option value="Sedang Digunakan">Sedang Digunakan</option>
+            <option value="Maintenance">Maintenance</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i class="fas fa-save"></i> <span id="btnSaveRuangan">Simpan Ruangan</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalAddPeminjaman" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-clipboard-list"></i> <span id="modalPeminjamanTitle">Ajukan Peminjaman</span></h3>
+        <button class="close-modal" onclick="closeModal('modalAddPeminjaman')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="formAddPeminjaman">
+        <input type="hidden" id="editPeminjamanId">
+        <div class="form-group">
+          <label class="form-label">Nama Organisasi</label>
+          <input type="text" class="form-control" id="namaOrganisasi" required placeholder="HIMA TI">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jenis Peminjaman</label>
+          <select class="form-control" id="jenisPeminjaman" required onchange="toggleItemSelect()">
+            <option value="">Pilih Jenis</option>
+            <option value="Barang">Barang</option>
+            <option value="Ruangan">Ruangan</option>
+          </select>
+        </div>
+        <div class="form-group" id="selectBarangGroup" style="display: none;">
+          <label class="form-label">Pilih Barang</label>
+          <select class="form-control" id="selectBarang">
+            <option value="">Pilih Barang</option>
+          </select>
+        </div>
+        <div class="form-group" id="selectRuanganGroup" style="display: none;">
+          <label class="form-label">Pilih Ruangan</label>
+          <select class="form-control" id="selectRuangan">
+            <option value="">Pilih Ruangan</option>
+          </select>
+        </div>
+        <div class="form-group" id="jumlahGroup" style="display: none;">
+          <label class="form-label">Jumlah</label>
+          <input type="number" class="form-control" id="jumlahPinjam" min="1" value="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal Pinjam</label>
+          <input type="datetime-local" class="form-control" id="tanggalPinjam" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tanggal Kembali</label>
+          <input type="datetime-local" class="form-control" id="tanggalKembali" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Keperluan</label>
+          <textarea class="form-control" id="keperluanPeminjaman" rows="3" placeholder="Jelaskan keperluan..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+          <i class="fas fa-paper-plane"></i> <span id="btnSavePeminjaman">Ajukan Peminjaman</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalDetailRiwayat" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-info-circle"></i> Detail Peminjaman</h3>
+        <button class="close-modal" onclick="closeModal('modalDetailRiwayat')">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="detailRiwayatContent" style="line-height: 1.8;">
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getDatabase, ref, set, get, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbD_Hz9pvmYwHXP-PcCMZ9nfzMfmAi_iM",
+      authDomain: "peminjaman-ti-umg.firebaseapp.com",
+      databaseURL: "https://peminjaman-ti-umg-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "peminjaman-ti-umg",
+      storageBucket: "peminjaman-ti-umg.firebasestorage.app",
+      messagingSenderId: "406253570102",
+      appId: "1:406253570102:web:408221677910144197f097",
+      measurementId: "G-MHSYWW66N8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+    let barangData = {};
+    let ruanganData = {};
+    let peminjamanData = {};
+    let chartPeminjaman = null;
+    let chartStatus = null;
+
+    async function initializeDefaultData() {
+      try {
+        const usersRef = ref(db, 'users');
+        const usersSnap = await get(usersRef);
+        
+        if (!usersSnap.exists()) {
+          console.log('Initializing default users...');
+          await set(ref(db, 'users'), {
+            admin: {
+              email: 'admin@umg.ac.id',
+              password: 'admin123',
+              role: 'admin',
+              nama: 'Administrator'
+            },
+            hima: {
+              email: 'hima@umg.ac.id',
+              password: 'hima123',
+              role: 'organisasi',
+              nama: 'HIMA TI'
+            },
+          });
+          console.log('✅ Default users created!');
+        }
+
+        const barangRef = ref(db, 'barang');
+        const barangSnap = await get(barangRef);
+        if (!barangSnap.exists()) {
+          await set(barangRef, { initialized: true });
+          await remove(ref(db, 'barang/initialized'));
+        }
+
+        const ruanganRef = ref(db, 'ruangan');
+        const ruanganSnap = await get(ruanganRef);
+        if (!ruanganSnap.exists()) {
+          await set(ruanganRef, { initialized: true });
+          await remove(ref(db, 'ruangan/initialized'));
+        }
+
+        const peminjamanRef = ref(db, 'peminjaman');
+        const peminjamanSnap = await get(peminjamanRef);
+        if (!peminjamanSnap.exists()) {
+          await set(peminjamanRef, { initialized: true });
+          await remove(ref(db, 'peminjaman/initialized'));
+        }
+      } catch (error) {
+        console.error('Initialize error:', error);
+        alert('⚠️ Error koneksi ke database. Pastikan Firebase rules sudah diset ke:\n\n{\n  "rules": {\n    ".read": true,\n    ".write": true\n  }\n}');
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const errorDiv = document.getElementById('loginError');
+
+      try {
+        const usersRef = ref(db, 'users');
+        const snapshot = await get(usersRef);
+        
+        if (snapshot.exists()) {
+          const users = snapshot.val();
+          let userFound = false;
+
+          for (const [key, user] of Object.entries(users)) {
+            if (user.email === email && user.password === password) {
+              currentUser = { ...user, id: key };
+              userFound = true;
+              break;
+            }
+          }
+
+          if (userFound) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('userRole').textContent = currentUser.role === 'admin' ? 'Administrator' : currentUser.nama;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            
+            setupUIForRole(currentUser.role);
+            loadAllData();
+            errorDiv.style.display = 'none';
+          } else {
+            errorDiv.style.display = 'block';
+          }
+        } else {
+          errorDiv.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        errorDiv.textContent = 'Terjadi kesalahan sistem';
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    function setupUIForRole(role) {
+      if (role === 'organisasi') {
+        document.getElementById('navBarang').style.display = 'none';
+        document.getElementById('navRuangan').style.display = 'none';
+        document.getElementById('navLaporan').style.display = 'none';
+      } else {
+        document.getElementById('btnAjukanPeminjaman').style.display = 'inline-flex';
+      }
+    }
+
+    function loadAllData() {
+      onValue(ref(db, 'barang'), (snapshot) => {
+        barangData = snapshot.val() || {};
+        renderBarangTable();
+        updateStats();
+        updateBarangSelect();
+      });
+
+      onValue(ref(db, 'ruangan'), (snapshot) => {
+        ruanganData = snapshot.val() || {};
+        renderRuanganTable();
+        updateStats();
+        updateRuanganSelect();
+      });
+
+      onValue(ref(db, 'peminjaman'), (snapshot) => {
+        peminjamanData = snapshot.val() || {};
+        renderPeminjamanTable();
+        renderRiwayatTable();
+        renderDashboardTable();
+        updateStats();
+        updateCharts();
+      });
+    }
+
+    function updateStats() {
+      const totalBarang = Object.keys(barangData).length;
+      const totalRuangan = Object.keys(ruanganData).length;
+      
+      const peminjamanArray = Object.values(peminjamanData);
+      const peminjamanAktif = peminjamanArray.filter(p => p.status === 'Disetujui').length;
+      const peminjamanPending = peminjamanArray.filter(p => p.status === 'Pending').length;
+      const totalSelesai = peminjamanArray.filter(p => p.status === 'Selesai').length;
+      const totalDitolak = peminjamanArray.filter(p => p.status === 'Ditolak').length;
+
+      const organisasiSet = new Set(peminjamanArray.map(p => p.organisasi));
+      const totalOrganisasi = organisasiSet.size;
+
+      const currentMonth = new Date().getMonth();
+      const totalBulanIni = peminjamanArray.filter(p => {
+        const pinjamDate = new Date(p.tanggalPinjam);
+        return pinjamDate.getMonth() === currentMonth;
+      }).length;
+
+      document.getElementById('totalBarang').textContent = totalBarang;
+      document.getElementById('totalRuangan').textContent = totalRuangan;
+      document.getElementById('peminjamanAktif').textContent = peminjamanAktif;
+      document.getElementById('peminjamanPending').textContent = peminjamanPending;
+      document.getElementById('totalSelesai').textContent = totalSelesai;
+      document.getElementById('totalDitolak').textContent = totalDitolak;
+      document.getElementById('totalOrganisasi').textContent = totalOrganisasi;
+      document.getElementById('totalBulanIni').textContent = totalBulanIni;
+    }
+
+    function updateCharts() {
+      updateChartPeminjaman();
+      updateChartStatus();
+    }
+
+    function updateChartPeminjaman() {
+      const ctx = document.getElementById('chartPeminjaman');
+      if (!ctx) return;
+
+      const monthlyData = {};
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      
+      months.forEach(month => {
+        monthlyData[month] = 0;
+      });
+
+      Object.values(peminjamanData).forEach(p => {
+        const date = new Date(p.tanggalPinjam);
+        const monthName = months[date.getMonth()];
+        monthlyData[monthName]++;
+      });
+
+      const data = {
+        labels: months,
+        datasets: [{
+          label: 'Jumlah Peminjaman',
+          data: Object.values(monthlyData),
+          backgroundColor: 'rgba(220, 38, 38, 0.2)',
+          borderColor: 'rgba(220, 38, 38, 1)',
+          borderWidth: 2,
+          tension: 0.4,
+          fill: true
+        }]
+      };
+
+      if (chartPeminjaman) {
+        chartPeminjaman.destroy();
+      }
+
+      chartPeminjaman = new Chart(ctx, {
+        type: 'line',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                color: '#f5f5f5'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                color: '#a3a3a3',
+                stepSize: 1
+              },
+              grid: {
+                color: '#262626'
+              }
+            },
+            x: {
+              ticks: {
+                color: '#a3a3a3'
+              },
+              grid: {
+                color: '#262626'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartStatus() {
+      const ctx = document.getElementById('chartStatus');
+      if (!ctx) return;
+
+      const statusData = {
+        'Pending': 0,
+        'Disetujui': 0,
+        'Selesai': 0,
+        'Ditolak': 0
+      };
+
+      Object.values(peminjamanData).forEach(p => {
+        if (statusData.hasOwnProperty(p.status)) {
+          statusData[p.status]++;
+        }
+      });
+
+      const data = {
+        labels: Object.keys(statusData),
+        datasets: [{
+          label: 'Status Peminjaman',
+          data: Object.values(statusData),
+          backgroundColor: [
+            'rgba(245, 158, 11, 0.6)',
+            'rgba(22, 163, 74, 0.6)',
+            'rgba(59, 130, 246, 0.6)',
+            'rgba(220, 38, 38, 0.6)'
+          ],
+          borderColor: [
+            'rgba(245, 158, 11, 1)',
+            'rgba(22, 163, 74, 1)',
+            'rgba(59, 130, 246, 1)',
+            'rgba(220, 38, 38, 1)'
+          ],
+          borderWidth: 2
+        }]
+      };
+
+      if (chartStatus) {
+        chartStatus.destroy();
+      }
+
+      chartStatus = new Chart(ctx, {
+        type: 'doughnut',
+        data: data,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#f5f5f5',
+                padding: 15
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderBarangTable() {
+      const tbody = document.getElementById('barangTable');
+      if (Object.keys(barangData).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">Belum ada data barang</td></tr>';
+        return;
+      }
+
+      let html = '';
+      for (const [id, barang] of Object.entries(barangData)) {
+        html += `
+          <tr>
+            <td style="font-weight: 600;">${barang.kode}</td>
+            <td>${barang.nama}</td>
+            <td><span class="badge badge-pending">${barang.kategori}</span></td>
+            <td>${barang.stok}</td>
+            <td><span class="badge ${barang.kondisi === 'Baik' ? 'badge-approved' : 'badge-rejected'}">${barang.kondisi}</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-warning btn-sm" onclick="window.editBarang('${id}')" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="window.deleteBarang('${id}')" style="background: var(--dark-red);" title="Hapus">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+        // Edit Barang
+    window.editBarang = async function(id) {
+      const barang = barangData[id];
+      if (!barang) return;
+      
+      document.getElementById('editBarangId').value = id;
+      document.getElementById('kodeBarang').value = barang.kode;
+      document.getElementById('namaBarang').value = barang.nama;
+      document.getElementById('kategoriBarang').value = barang.kategori;
+      document.getElementById('stokBarang').value = barang.stok;
+      document.getElementById('kondisiBarang').value = barang.kondisi;
+      document.getElementById('keteranganBarang').value = barang.keterangan || '';
+      
+      document.getElementById('modalBarangTitle').textContent = 'Edit Barang';
+      document.getElementById('btnSaveBarang').textContent = 'Update Barang';
+      
+      openModal('modalAddBarang');
+    };
+
+    function renderRuanganTable() {
+      const tbody = document.getElementById('ruanganTable');
+      if (Object.keys(ruanganData).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">Belum ada data ruangan</td></tr>';
+        return;
+      }
+
+      let html = '';
+      for (const [id, ruangan] of Object.entries(ruanganData)) {
+        html += `
+          <tr>
+            <td style="font-weight: 600;">${ruangan.kode}</td>
+            <td>${ruangan.nama}</td>
+            <td>${ruangan.kapasitas} orang</td>
+            <td style="font-size: 0.85rem;">${ruangan.fasilitas}</td>
+            <td><span class="badge ${ruangan.status === 'Tersedia' ? 'badge-approved' : 'badge-pending'}">${ruangan.status}</span></td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-warning btn-sm" onclick="window.editRuangan('${id}')" title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="window.deleteRuangan('${id}')" style="background: var(--dark-red);" title="Hapus">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    function renderPeminjamanTable() {
+      const tbody = document.getElementById('peminjamanTable');
+      const peminjamanArray = Object.entries(peminjamanData)
+        .filter(([_, p]) => p.status !== 'Selesai' && p.status !== 'Ditolak')
+        .sort((a, b) => new Date(b[1].tanggalPinjam) - new Date(a[1].tanggalPinjam));
+
+      if (peminjamanArray.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px;">Belum ada data peminjaman</td></tr>';
+        return;
+      }
+
+      let html = '';
+      for (const [id, peminjaman] of peminjamanArray) {
+        const statusClass = peminjaman.status === 'Pending' ? 'badge-pending' : 
+                           peminjaman.status === 'Disetujui' ? 'badge-approved' : 'badge-rejected';
+        
+        const canApprove = currentUser.role === 'admin' && peminjaman.status === 'Pending';
+        const canComplete = currentUser.role === 'admin' && peminjaman.status === 'Disetujui';
+        
+              html += `
+        <tr>
+          <td style="font-weight: 600;">${peminjaman.organisasi}</td>
+          <td><span class="badge badge-pending">${peminjaman.jenis}</span></td>
+          <td>${peminjaman.item}</td>
+          <td style="font-size: 0.85rem;">${formatDateTime(peminjaman.tanggalPinjam)}</td>
+          <td style="font-size: 0.85rem;">${formatDateTime(peminjaman.tanggalKembali)}</td>
+          <td><span class="badge ${statusClass}">${peminjaman.status}</span></td>
+          <td>
+            <div class="action-buttons">
+              ${canApprove ? `
+                <button class="btn btn-success btn-sm" onclick="window.approvePeminjaman('${id}')" title="Setujui">
+                  <i class="fas fa-check"></i>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="window.rejectPeminjaman('${id}')" style="background: var(--dark-red);" title="Tolak">
+                  <i class="fas fa-times"></i>
+                </button>
+              ` : ''}
+              ${canComplete ? `
+                <button class="btn btn-success btn-sm" onclick="window.completePeminjaman('${id}')" title="Selesaikan" style="background: #059669;">
+                  <i class="fas fa-check-double"></i>
+                </button>
+              ` : ''}
+              ${!canApprove && !canComplete ? '-' : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    // Render Riwayat Table
+    // Render Riwayat Table
+    function renderRiwayatTable() {
+      const tbody = document.getElementById('riwayatTable');
+      const riwayatArray = Object.entries(peminjamanData)
+        .filter(([_, p]) => p.status === 'Selesai' || p.status === 'Ditolak')
+        .sort((a, b) => new Date(b[1].tanggalPinjam) - new Date(a[1].tanggalPinjam));
+
+      if (riwayatArray.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px;">Belum ada riwayat</td></tr>';
+        return;
+      }
+
+      let html = '';
+      for (const [id, peminjaman] of riwayatArray) {
+        const statusClass = peminjaman.status === 'Selesai' ? 'badge-approved' : 'badge-rejected';
+        
+        html += `
+          <tr>
+            <td style="font-weight: 600;">${peminjaman.organisasi}</td>
+            <td><span class="badge badge-pending">${peminjaman.jenis}</span></td>
+            <td>${peminjaman.item}</td>
+            <td style="font-size: 0.85rem;">${formatDateTime(peminjaman.tanggalPinjam)} - ${formatDateTime(peminjaman.tanggalKembali)}</td>
+            <td><span class="badge ${statusClass}">${peminjaman.status}</span></td>
+            <td>
+              <button class="btn btn-secondary btn-sm" onclick="window.viewDetailRiwayat('${id}')" title="Lihat Detail">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    // Render Dashboard Table
+    function renderDashboardTable() {
+      const tbody = document.getElementById('dashboardTable');
+      const recentArray = Object.entries(peminjamanData)
+        .sort((a, b) => new Date(b[1].tanggalPinjam) - new Date(a[1].tanggalPinjam))
+        .slice(0, 5);
+
+      if (recentArray.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px;">Belum ada data peminjaman</td></tr>';
+        return;
+      }
+
+      let html = '';
+      for (const [_, peminjaman] of recentArray) {
+        const statusClass = peminjaman.status === 'Pending' ? 'badge-pending' : 
+                           peminjaman.status === 'Disetujui' ? 'badge-approved' : 
+                           peminjaman.status === 'Selesai' ? 'badge-approved' : 'badge-rejected';
+        
+        html += `
+          <tr>
+            <td style="font-weight: 600;">${peminjaman.organisasi}</td>
+            <td>${peminjaman.item}</td>
+            <td style="font-size: 0.85rem;">${formatDateTime(peminjaman.tanggalPinjam)}</td>
+            <td><span class="badge ${statusClass}">${peminjaman.status}</span></td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = html;
+    }
+
+    // Add Barang
+    // Add/Edit Barang
+    document.getElementById('formAddBarang').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const editId = document.getElementById('editBarangId').value;
+      const barangData = {
+        kode: document.getElementById('kodeBarang').value,
+        nama: document.getElementById('namaBarang').value,
+        kategori: document.getElementById('kategoriBarang').value,
+        stok: parseInt(document.getElementById('stokBarang').value),
+        kondisi: document.getElementById('kondisiBarang').value,
+        keterangan: document.getElementById('keteranganBarang').value,
+      };
+      
+      if (editId) {
+        // Update existing
+        barangData.updatedAt = new Date().toISOString();
+        await update(ref(db, `barang/${editId}`), barangData);
+        alert('✅ Barang berhasil diupdate!');
+      } else {
+        // Create new
+        barangData.createdAt = new Date().toISOString();
+        const barangRef = push(ref(db, 'barang'));
+        await set(barangRef, barangData);
+        alert('✅ Barang berhasil ditambahkan!');
+      }
+
+      closeModal('modalAddBarang');
+      document.getElementById('formAddBarang').reset();
+      document.getElementById('editBarangId').value = '';
+      document.getElementById('modalBarangTitle').textContent = 'Tambah Barang';
+      document.getElementById('btnSaveBarang').textContent = 'Simpan Barang';
+    });
+
+    // Edit Ruangan
+    window.editRuangan = async function(id) {
+      const ruangan = ruanganData[id];
+      if (!ruangan) return;
+      
+      document.getElementById('editRuanganId').value = id;
+      document.getElementById('kodeRuangan').value = ruangan.kode;
+      document.getElementById('namaRuangan').value = ruangan.nama;
+      document.getElementById('kapasitasRuangan').value = ruangan.kapasitas;
+      document.getElementById('fasilitasRuangan').value = ruangan.fasilitas;
+      document.getElementById('statusRuangan').value = ruangan.status;
+      
+      document.getElementById('modalRuanganTitle').textContent = 'Edit Ruangan';
+      document.getElementById('btnSaveRuangan').textContent = 'Update Ruangan';
+      
+      openModal('modalAddRuangan');
+    };
+
+    // Add/Edit Ruangan
+    document.getElementById('formAddRuangan').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const editId = document.getElementById('editRuanganId').value;
+      const ruanganData = {
+        kode: document.getElementById('kodeRuangan').value,
+        nama: document.getElementById('namaRuangan').value,
+        kapasitas: parseInt(document.getElementById('kapasitasRuangan').value),
+        fasilitas: document.getElementById('fasilitasRuangan').value,
+        status: document.getElementById('statusRuangan').value,
+      };
+      
+      if (editId) {
+        // Update existing
+        ruanganData.updatedAt = new Date().toISOString();
+        await update(ref(db, `ruangan/${editId}`), ruanganData);
+        alert('✅ Ruangan berhasil diupdate!');
+      } else {
+        // Create new
+        ruanganData.createdAt = new Date().toISOString();
+        const ruanganRef = push(ref(db, 'ruangan'));
+        await set(ruanganRef, ruanganData);
+        alert('✅ Ruangan berhasil ditambahkan!');
+      }
+
+      closeModal('modalAddRuangan');
+      document.getElementById('formAddRuangan').reset();
+      document.getElementById('editRuanganId').value = '';
+      document.getElementById('modalRuanganTitle').textContent = 'Tambah Ruangan';
+      document.getElementById('btnSaveRuangan').textContent = 'Simpan Ruangan';
+    });
+
+    // Add Peminjaman
+    document.getElementById('formAddPeminjaman').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const jenis = document.getElementById('jenisPeminjaman').value;
+      let item;
+      
+      if (jenis === 'Barang') {
+        const barangId = document.getElementById('selectBarang').value;
+        item = barangData[barangId].nama;
+      } else {
+        const ruanganId = document.getElementById('selectRuangan').value;
+        item = ruanganData[ruanganId].nama;
+      }
+
+      const peminjamanRef = push(ref(db, 'peminjaman'));
+      await set(peminjamanRef, {
+        organisasi: document.getElementById('namaOrganisasi').value,
+        jenis: jenis,
+        item: item,
+        jumlah: jenis === 'Barang' ? parseInt(document.getElementById('jumlahPinjam').value) : 1,
+        tanggalPinjam: document.getElementById('tanggalPinjam').value,
+        tanggalKembali: document.getElementById('tanggalKembali').value,
+        keperluan: document.getElementById('keperluanPeminjaman').value,
+        status: 'Pending',
+        createdBy: currentUser.id,
+        createdAt: new Date().toISOString()
+      });
+
+      closeModal('modalAddPeminjaman');
+      document.getElementById('formAddPeminjaman').reset();
+      toggleItemSelect();
+      alert('✅ Peminjaman berhasil diajukan!');
+    });
+
+    // Toggle Item Select
+    window.toggleItemSelect = function() {
+      const jenis = document.getElementById('jenisPeminjaman').value;
+      const barangGroup = document.getElementById('selectBarangGroup');
+      const ruanganGroup = document.getElementById('selectRuanganGroup');
+      const jumlahGroup = document.getElementById('jumlahGroup');
+
+      barangGroup.style.display = 'none';
+      ruanganGroup.style.display = 'none';
+      jumlahGroup.style.display = 'none';
+
+      if (jenis === 'Barang') {
+        barangGroup.style.display = 'block';
+        jumlahGroup.style.display = 'block';
+      } else if (jenis === 'Ruangan') {
+        ruanganGroup.style.display = 'block';
+      }
+    };
+
+    // Update Select Options
+    function updateBarangSelect() {
+      const select = document.getElementById('selectBarang');
+      select.innerHTML = '<option value="">Pilih Barang</option>';
+      
+      for (const [id, barang] of Object.entries(barangData)) {
+        if (barang.kondisi === 'Baik' && barang.stok > 0) {
+          select.innerHTML += `<option value="${id}">${barang.nama} (Stok: ${barang.stok})</option>`;
+        }
+      }
+    }
+
+    function updateRuanganSelect() {
+      const select = document.getElementById('selectRuangan');
+      select.innerHTML = '<option value="">Pilih Ruangan</option>';
+      
+      for (const [id, ruangan] of Object.entries(ruanganData)) {
+        if (ruangan.status === 'Tersedia') {
+          select.innerHTML += `<option value="${id}">${ruangan.nama} (${ruangan.kapasitas} orang)</option>`;
+        }
+      }
+    }
+
+          // ========== FUNGSI PEMINJAMAN ==========
+
+    // Approve Peminjaman
+    window.approvePeminjaman = async function(id) {
+      if (!confirm('Setujui peminjaman ini?')) return;
+      
+      await update(ref(db, `peminjaman/${id}`), {
+        status: 'Disetujui',
+        approvedBy: currentUser.id,
+        approvedAt: new Date().toISOString()
+      });
+      
+      alert('✅ Peminjaman disetujui!');
+    };
+
+    // Reject Peminjaman
+    window.rejectPeminjaman = async function(id) {
+      if (!confirm('Tolak peminjaman ini?')) return;
+      
+      await update(ref(db, `peminjaman/${id}`), {
+        status: 'Ditolak',
+        rejectedBy: currentUser.id,
+        rejectedAt: new Date().toISOString()
+      });
+      
+      alert('❌ Peminjaman ditolak!');
+    };
+
+    // Complete Peminjaman
+    window.completePeminjaman = async function(id) {
+      if (!confirm('Tandai peminjaman ini sebagai selesai?')) return;
+      
+      await update(ref(db, `peminjaman/${id}`), {
+        status: 'Selesai',
+        completedBy: currentUser.id,
+        completedAt: new Date().toISOString()
+      });
+      
+      alert('✅ Peminjaman selesai!');
+    };
+
+    // View Detail Riwayat
+    window.viewDetailRiwayat = function(id) {
+      const peminjaman = peminjamanData[id];
+      if (!peminjaman) return;
+      
+      const statusClass = peminjaman.status === 'Selesai' ? 'badge-approved' : 'badge-rejected';
+      
+      const detailHTML = `
+        <div style="line-height: 2;">
+          <p><strong>Organisasi:</strong> ${peminjaman.organisasi}</p>
+          <p><strong>Jenis:</strong> <span class="badge badge-pending">${peminjaman.jenis}</span></p>
+          <p><strong>Item:</strong> ${peminjaman.item}</p>
+          ${peminjaman.jumlah ? `<p><strong>Jumlah:</strong> ${peminjaman.jumlah}</p>` : ''}
+          <p><strong>Tanggal Pinjam:</strong> ${formatDateTime(peminjaman.tanggalPinjam)}</p>
+          <p><strong>Tanggal Kembali:</strong> ${formatDateTime(peminjaman.tanggalKembali)}</p>
+          <p><strong>Keperluan:</strong> ${peminjaman.keperluan}</p>
+          <p><strong>Status:</strong> <span class="badge ${statusClass}">${peminjaman.status}</span></p>
+          ${peminjaman.approvedAt ? `<p><strong>Disetujui pada:</strong> ${formatDateTime(peminjaman.approvedAt)}</p>` : ''}
+          ${peminjaman.rejectedAt ? `<p><strong>Ditolak pada:</strong> ${formatDateTime(peminjaman.rejectedAt)}</p>` : ''}
+          ${peminjaman.completedAt ? `<p><strong>Diselesaikan pada:</strong> ${formatDateTime(peminjaman.completedAt)}</p>` : ''}
+        </div>
+      `;
+      
+      document.getElementById('detailRiwayatContent').innerHTML = detailHTML;
+      openModal('modalDetailRiwayat');
+    };
+
+    // ========== FUNGSI DELETE ==========
+
+    // Delete Barang
+    window.deleteBarang = async function(id) {
+      if (!confirm('Hapus barang ini?')) return;
+      
+      await remove(ref(db, `barang/${id}`));
+      alert('✅ Barang berhasil dihapus!');
+    };
+
+    // Delete Ruangan
+    window.deleteRuangan = async function(id) {
+      if (!confirm('Hapus ruangan ini?')) return;
+      
+      await remove(ref(db, `ruangan/${id}`));
+      alert('✅ Ruangan berhasil dihapus!');
+    };
+
+    // Format DateTime
+    function formatDateTime(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+        // Export Riwayat
+    window.exportRiwayat = function() {
+      const riwayatArray = Object.entries(peminjamanData)
+        .filter(([_, p]) => p.status === 'Selesai' || p.status === 'Ditolak');
+        
+      if (riwayatArray.length === 0) {
+        alert('⚠️ Belum ada data riwayat untuk diexport');
+        return;
+      }
+      
+      let csv = 'Organisasi,Jenis,Item,Jumlah,Tanggal Pinjam,Tanggal Kembali,Keperluan,Status\n';
+      
+      for (const [_, peminjaman] of riwayatArray) {
+        csv += `"${peminjaman.organisasi}","${peminjaman.jenis}","${peminjaman.item}","${peminjaman.jumlah || 1}","${peminjaman.tanggalPinjam}","${peminjaman.tanggalKembali}","${peminjaman.keperluan}","${peminjaman.status}"\n`;
+      }
+      
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `riwayat_peminjaman_${new Date().getTime()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('✅ Riwayat berhasil diexport!');
+    };
+
+    // Export Laporan
+    window.exportLaporan = function() {
+      let csv = 'Organisasi,Jenis,Item,Tanggal Pinjam,Tanggal Kembali,Status\n';
+      
+      for (const peminjaman of Object.values(peminjamanData)) {
+        csv += `"${peminjaman.organisasi}","${peminjaman.jenis}","${peminjaman.item}","${peminjaman.tanggalPinjam}","${peminjaman.tanggalKembali}","${peminjaman.status}"\n`;
+      }
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `laporan_peminjaman_${new Date().getTime()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    // Initialize
+    initializeDefaultData();
+  </script>
+
+  <script>
+    // Hamburger Menu
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      sidebar.classList.toggle('active');
+      sidebarOverlay.classList.toggle('active');
+    });
+
+    sidebarOverlay.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      sidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    });
+
+    // Show Section
+    window.showSection = function(sectionId) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      document.getElementById(sectionId).classList.add('active');
+      event.target.closest('.nav-item').classList.add('active');
+      
+      // Close sidebar on mobile
+      if (window.innerWidth <= 768) {
+        hamburger.classList.remove('active');
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+      }
+    };
+
+    // Modal Functions
+    window.openModal = function(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    };
+
+    window.closeModal = function(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    };
+
+    // Close modal on outside click
+    window.addEventListener('click', (e) => {
+      if (e.target.classList.contains('modal')) {
+        e.target.classList.remove('active');
+      }
+    });
+
+    // Logout
+    window.logout = function() {
+      if (!confirm('Yakin ingin logout?')) return;
+      location.reload();
+    };
+  </script>
+
+</body>
+</html>
