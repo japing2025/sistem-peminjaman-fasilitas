@@ -1335,6 +1335,67 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+        // ==================== SESSION MANAGEMENT ====================
+    // Letakkan code ini setelah: const db = getDatabase(app);
+
+    // Function untuk menyimpan session
+    function saveSession(userData) {
+      localStorage.setItem('umg_session', JSON.stringify({
+        user: userData,
+        loginTime: new Date().getTime(),
+        expiresIn: 24 * 60 * 60 * 1000 // 24 jam
+      }));
+    }
+
+    // Function untuk mendapatkan session
+    function getSession() {
+      const session = localStorage.getItem('umg_session');
+      if (!session) return null;
+      
+      try {
+        const data = JSON.parse(session);
+        const now = new Date().getTime();
+        
+        // Cek apakah session sudah expired (24 jam)
+        if (now - data.loginTime > data.expiresIn) {
+          clearSession();
+          return null;
+        }
+        
+        return data.user;
+      } catch (error) {
+        clearSession();
+        return null;
+      }
+    }
+
+    // Function untuk menghapus session
+    function clearSession() {
+      localStorage.removeItem('umg_session');
+    }
+
+    // Function untuk auto-login jika ada session aktif
+    function checkAutoLogin() {
+      const savedUser = getSession();
+      
+      if (savedUser) {
+        // Auto login
+        currentUser = savedUser;
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('userRole').textContent = 
+          currentUser.role === 'admin' ? 'Administrator' : currentUser.nama;
+        document.getElementById('userEmail').textContent = currentUser.email;
+        
+        setupUIForRole(currentUser.role);
+        loadAllData();
+        
+        console.log('✅ Auto-login berhasil!');
+      }
+    }
+
+    // Panggil saat halaman dimuat
+    checkAutoLogin();
+
     let currentUser = null;
     let barangData = {};
     let ruanganData = {};
@@ -1392,6 +1453,7 @@
       }
     }
 
+        // GANTI CODE INI (cari: document.getElementById('loginForm').addEventListener)
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
@@ -1410,18 +1472,25 @@
             if (user.email === email && user.password === password) {
               currentUser = { ...user, id: key };
               userFound = true;
+              
+              // 🔥 SIMPAN SESSION
+              saveSession(currentUser);
+              
               break;
             }
           }
 
           if (userFound) {
             document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('userRole').textContent = currentUser.role === 'admin' ? 'Administrator' : currentUser.nama;
+            document.getElementById('userRole').textContent = 
+              currentUser.role === 'admin' ? 'Administrator' : currentUser.nama;
             document.getElementById('userEmail').textContent = currentUser.email;
             
             setupUIForRole(currentUser.role);
             loadAllData();
             errorDiv.style.display = 'none';
+            
+            alert('✅ Login berhasil!');
           } else {
             errorDiv.style.display = 'block';
           }
@@ -2203,11 +2272,27 @@
       }
     });
 
-    // Logout
+        // GANTI CODE INI (cari: window.logout = function())
     window.logout = function() {
       if (!confirm('Yakin ingin logout?')) return;
+      
+      // 🔥 HAPUS SESSION
+      clearSession();
+      
+      // Reload halaman
       location.reload();
     };
+        function saveSession(userData) {
+      // Generate simple token
+      const token = btoa(`${userData.email}-${Date.now()}`);
+      
+      localStorage.setItem('umg_session', JSON.stringify({
+        user: userData,
+        token: token,
+        loginTime: new Date().getTime(),
+        expiresIn: 24 * 60 * 60 * 1000
+      }));
+    }
   </script>
 
 </body>
